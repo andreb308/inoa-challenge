@@ -1,15 +1,17 @@
 require("dotenv").config();
 
+import cors from "cors";
 import axios from "axios";
-import { log } from "console";
 import express from "express";
-const app = express();
+import { BrApiResponse, BrApiResponseFail, FetchDataResponse } from "./types";
 
+const app = express();
+app.use(cors());
 /******************************************************************************************
  API Configuration
 
  TO DO: 
-  - Parse query params (ativos, range, interval) and send separate requests on a loop
+  - [DONE!] Parse query params (tickers, range, interval) and send separate requests on a loop
   - Filter only necessary data from the response, send clean info to the frontend
   - Check error handling and response structure (send correct status codes and messages)
  ******************************************************************************************/
@@ -18,17 +20,25 @@ const api = axios.create({
   baseURL: "https://brapi.dev/api",
 });
 
-const fetchData = async (ativo: string) => {
-  let results = [];
+const isErrorResponse = (data: BrApiResponse): data is BrApiResponseFail => {
+  return "error" in data && data.error === true;
+};
 
+const fetchData = async (ticker: string): Promise<FetchDataResponse> => {
   try {
-    results = await api
+    const data: BrApiResponse = await api
       .get(
-        `/quote/${ativo}?range=1mo&interval=1d&token=${process.env.BRAPI_APIKEY}`
+        `/quote/${ticker}?range=3mo&interval=1d&token=${process.env.BRAPI_APIKEY}`
       )
       .then((res) => res.data);
 
-    return { error: false, data: results };
+    // Check if the response contains an error
+    if (isErrorResponse(data)) {
+      throw new Error(data.message);
+    }
+
+    // By this point, we can assume data is of type BrApiResponseSuccess
+    return { error: false, data };
   } catch (err) {
     console.log(err);
     return { error: true, message: `Failed to fetch data: ${err}` };
@@ -36,18 +46,38 @@ const fetchData = async (ativo: string) => {
 };
 
 app.get("/", async (req, res) => {
-  const ativos = (req.query.ativos as string).split(",") || ["PETR4"];
-  console.log(ativos);
+  const tickers = JSON.parse((req.query.ativos as string) || "[]");
+  console.log(tickers);
+  let resultsArray = [];
 
-  console.log("Fetching data...");
-  const results = await fetchData(ativos[0]);
-
-  if (results.error) {
-    return res.status(500).json({ error: results.message });
+  if (tickers.length === 0) {
+    return res.status(400).json({ status: 400, error: "No tickers provided." });
   }
 
-  res.json(results.data);
-  console.log(results);
+  for (const ticker of tickers) {
+    if (!ticker || ticker.trim() === "") {
+      return res
+        .status(400)
+        .json({ status: 400, error: `Invalid ticker: '${ticker}'` });
+    }
+    if (typeof ticker !== "string") {
+      return res
+        .status(400)
+        .json({ status: 400, error: `ticker must be a string: ${ticker}` });
+    }
+
+    const response: FetchDataResponse = await fetchData(ticker);
+
+    if (response.error) {
+      return res.status(500).json({ error: response.message });
+    }
+
+    resultsArray.push(response.data!.results[0] || {});
+  }
+  console.log("Fetching data...");
+
+  res.json(resultsArray || [{}]);
+  console.log(resultsArray);
 });
 
 app.listen(1313, () => console.log("Server ready on port 1313."));
