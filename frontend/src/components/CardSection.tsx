@@ -6,8 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { TrendingUpIcon } from "lucide-react";
 import mockData from "@/lib/mockData";
 
 function CardSection({ data }: { data: typeof mockData }) {
@@ -39,12 +37,14 @@ function CardSection({ data }: { data: typeof mockData }) {
             </CardHeader>
             <CardFooter className="flex-col items-start gap-1 text-sm">
               <div className="line-clamp-1 flex gap-2 font-medium">
-                {ticker.shortName} <TrendingUpIcon className="size-4" />
+                {ticker.shortName}
               </div>
               <div className="text-card-foreground">
                 <p className="text-2xl font-semibold">
                   {`R$ ${
-                    ticker.historicalDataPrice.at(-1)?.adjustedClose ?? "( - )"
+                    ticker.historicalDataPrice
+                      .at(-1)
+                      ?.adjustedClose.toFixed(2) ?? "( - )"
                   }`}
                 </p>
                 {`Fechamento (${new Date(
