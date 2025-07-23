@@ -47,8 +47,25 @@ const fetchData = async (ticker: string): Promise<FetchDataResponse> => {
 
 app.get("/", async (req, res) => {
   const tickers = JSON.parse((req.query.ativos as string) || "[]");
-  console.log(tickers);
+  const startDate = new Date(req.query.startDate as string);
+  const endDate = new Date(req.query.endDate as string);
   let resultsArray = [];
+
+  console.log(
+    "Received request with tickers:",
+    tickers,
+    "startDate:",
+    startDate,
+    "endDate:",
+    endDate
+  );
+
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    return res.status(400).json({
+      status: 400,
+      error: "Invalid date format. Please provide valid start and end dates.",
+    });
+  }
 
   if (tickers.length === 0) {
     return res.status(400).json({ status: 400, error: "No tickers provided." });
@@ -72,12 +89,25 @@ app.get("/", async (req, res) => {
       return res.status(500).json({ error: response.message });
     }
 
+    // Filtering historical data based on the provided date range
+    response.data.results[0].historicalDataPrice =
+      response.data.results[0].historicalDataPrice.filter((item) => {
+        console.log(
+          `Comparing item date: ${item.date} with range ${startDate.getTime()} - ${endDate.getTime()}`
+        );
+        return (
+          new Date(item.date * 1000).getTime() >= startDate.getTime() &&
+          new Date(item.date * 1000).getTime() <= endDate.getTime()
+        );
+      });
+
     resultsArray.push(response.data!.results[0] || {});
   }
   console.log("Fetching data...");
 
   res.json(resultsArray || [{}]);
-  console.log(resultsArray);
+
+  // console.log(resultsArray);
 });
 
 app.listen(1313, () => console.log("Server ready on port 1313."));
