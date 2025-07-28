@@ -7,14 +7,6 @@ import { BrApiResponse, BrApiResponseFail, FetchDataResponse } from "./types";
 
 const app = express();
 app.use(cors());
-/******************************************************************************************
- API Configuration
-
- TO DO: 
-  - [DONE!] Parse query params (tickers, range, interval) and send separate requests on a loop
-  - Filter only necessary data from the response, send clean info to the frontend
-  - Check error handling and response structure (send correct status codes and messages)
- ******************************************************************************************/
 
 const api = axios.create({
   baseURL: "https://brapi.dev/api",
@@ -37,10 +29,9 @@ const fetchData = async (ticker: string): Promise<FetchDataResponse> => {
       throw new Error(data.message);
     }
 
-    // By this point, we can assume data is of type BrApiResponseSuccess
+    // By this point, data will be of type BrApiResponseSuccess
     return { error: false, data };
   } catch (err) {
-    console.log(err);
     return { error: true, message: `Failed to fetch data: ${err}` };
   }
 };
@@ -51,14 +42,7 @@ app.get("/", async (req, res) => {
   const endDate = new Date(req.query.endDate as string);
   let resultsArray = [];
 
-  console.log(
-    "Received request with tickers:",
-    tickers,
-    "startDate:",
-    startDate,
-    "endDate:",
-    endDate
-  );
+  console.log("Received request with tickers:", tickers, "startDate:", startDate, "endDate:", endDate );
 
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
     return res.status(400).json({
@@ -86,15 +70,13 @@ app.get("/", async (req, res) => {
     const response: FetchDataResponse = await fetchData(ticker);
 
     if (response.error) {
-      return res.status(500).json({ error: response.message });
+      console.log('Ticker:', ticker, 'Error:', response.message);
+      continue; // Skip this ticker if there's an error
     }
 
     // Filtering historical data based on the provided date range
     response.data.results[0].historicalDataPrice =
       response.data.results[0].historicalDataPrice.filter((item) => {
-        console.log(
-          `Comparing item date: ${item.date} with range ${startDate.getTime()} - ${endDate.getTime()}`
-        );
         return (
           new Date(item.date * 1000).getTime() >= startDate.getTime() &&
           new Date(item.date * 1000).getTime() <= endDate.getTime()
@@ -106,8 +88,6 @@ app.get("/", async (req, res) => {
   console.log("Fetching data...");
 
   res.json(resultsArray || [{}]);
-
-  // console.log(resultsArray);
 });
 
 app.listen(1313, () => console.log("Server ready on port 1313."));
