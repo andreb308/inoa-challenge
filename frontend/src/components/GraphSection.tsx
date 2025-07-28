@@ -1,10 +1,7 @@
-import { useState, useEffect } from "react";
 import mockData from "@/lib/mockData";
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -19,21 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const description = "An interactive area chart";
 
@@ -87,32 +69,17 @@ export default function ChartAreaInteractive({
 }) {
   if (!data || data.length === 0) {
     return (
-      <Card>
+      <Card className="motion-preset-slide-up-lg motion-delay-1000">
         <CardHeader>
-          <CardTitle>No Data Available</CardTitle>
+          <CardTitle>Sem dados disponíveis</CardTitle>
           <CardDescription>
-            Please select a valid ticker to display the chart.
+            Selecione ativos válidos para exibir o gráfico.
           </CardDescription>
         </CardHeader>
       </Card>
     );
   }
-  // const [timeRange, setTimeRange] = useState("90d");
   const transformedData = transformHistoricalData(data);
-  // const filteredData = transformedData.filter((item) => {
-  //   const date = new Date(item.date);
-  //   const referenceDate = new Date();
-  //   let daysToSubtract = 90;
-  //   if (timeRange === "30d") {
-  //     daysToSubtract = 30;
-  //   } else if (timeRange === "7d") {
-  //     daysToSubtract = 7;
-  //   }
-  //   const startDate = new Date(referenceDate);
-  //   startDate.setDate(startDate.getDate() - daysToSubtract);
-  //   return date >= startDate;
-  // });
-  // console.log(filteredData);
 
   return (
     <Card>
@@ -125,7 +92,7 @@ export default function ChartAreaInteractive({
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="h-[400px] w-[800px] px-2 pt-4 sm:px-6 sm:pt-6">
+      <CardContent className="h-[400px] w-[800px] px-2 pt-4 motion-scale-in-[0.5] motion-blur-in-[10px] motion-duration-1500 motion-delay-[0.75s]/blur max-lg:w-full sm:px-6 sm:pt-6">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={transformedData}

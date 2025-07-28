@@ -43,7 +43,7 @@ export default function Calendar22({
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 max-lg:w-full">
       <Label htmlFor="date" className="px-1">
         Data de {type === "start" ? "Início" : "Fim"}
       </Label>
@@ -52,7 +52,7 @@ export default function Calendar22({
           <Button
             variant="outline"
             id="date"
-            className="w-48 justify-between font-normal"
+            className="w-48 max-lg:w-full justify-between font-normal"
           >
             {date ? date.toLocaleDateString() : "Selecione..."}
             <ChevronDownIcon />

@@ -24,7 +24,7 @@ export default function InputWithTags({ stateSetter }: { stateSetter: any }) {
   const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
 
   return (
-    <div className="*:not-first:mt-2 flex w-[50%] flex-col gap-3">
+    <div className="*:not-first:mt-2 flex w-[50%] flex-col gap-3 max-lg:w-full">
       <Label htmlFor="date" className="px-1">
         Ativos
       </Label>
@@ -51,10 +51,10 @@ export default function InputWithTags({ stateSetter }: { stateSetter: any }) {
         placeholder="Add a tag"
         styleClasses={{
           inlineTagsContainer:
-            "border-input rounded-md bg-background shadow-xs transition-[color,box-shadow] focus-within:border-ring outline-none focus-within:ring-[3px] focus-within:ring-ring/50 p-1 gap-1 border-2 border-blue-500 border-solid rounded-full",
+            "border-input bg-background shadow-xs transition-[color,box-shadow] focus-within:border-ring outline-none focus-within:ring-[3px] focus-within:ring-ring/50 p-1 gap-1 border-2 border-blue-500 border-solid rounded-[40px] max-lg:rounded-lg",
           input: "w-[60dvw] min-w-[80px] shadow-none px-2 h-7",
           tag: {
-            body: "h-7 relative bg-background border border-input hover:bg-background rounded-md font-medium text-xs ps-2 pe-7 border-2 border-blue-200 border-solid rounded-full",
+            body: "h-7 relative bg-background border border-input hover:bg-background rounded-md font-medium text-xs ps-2 pe-7 border-2 border-blue-200 border-solid rounded-[40px]",
             closeButton:
               "absolute -inset-y-px -end-px p-0 rounded-e-md flex size-7 transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] text-muted-foreground/80 hover:text-foreground",
           },

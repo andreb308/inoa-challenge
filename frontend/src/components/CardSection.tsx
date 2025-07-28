@@ -1,4 +1,3 @@
-// import React from 'react'
 import {
   Card,
   CardDescription,
@@ -22,10 +21,6 @@ function CardSection({ data }: { data: typeof mockData }) {
                 {ticker.symbol}
               </CardDescription>
               <CardTitle className="font-semibold tabular-nums">
-                {/* <Badge variant="" className="flex gap-1 rounded-lg text-xs">
-              <TrendingUpIcon className="size-3" />
-              +12.5%
-            </Badge> */}
               </CardTitle>
               <div className="absolute right-4 top-4">
                 <img
